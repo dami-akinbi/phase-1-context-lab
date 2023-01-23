@@ -31,9 +31,9 @@ function createEmployeeRecord(fourElementArray) {
 // console.log(answer);
 
 function createEmployeeRecords(arrayOfArrays) {
-  let result = [];
-  for (let array of arrayOfArrays) result.push(createEmployeeRecord(array));
-  return result;
+  return arrayOfArrays.map((member) => {
+    return createEmployeeRecord(member);
+  });
 }
 
 // TASK THREE
@@ -52,40 +52,26 @@ function createEmployeeRecords(arrayOfArrays) {
 // console.log(answer);
 
 function createTimeInEvent(dateStamp) {
-  let employeeRecord = {
-    firstName: "Simba",
-    familyName: "King",
-    title: "",
-    timeInEvents: [],
-    timeOutEvents: [],
-  };
-
-  employeeRecord.timeInEvents[0] = {
+  let [date, hour] = dateStamp.split(" ");
+  this.timeInEvents.push({
     type: "TimeIn",
-    date: dateStamp.split(" ")[0],
-    hour: +dateStamp.split(" ")[1],
-  };
-  return employeeRecord;
+    hour: parseInt(hour, 10),
+    date,
+  });
+  return this;
 }
 
 // TASK FOUR
 // copy and tweak the code for createTimeInEvent() function
 
 function createTimeOutEvent(dateStamp) {
-  let employeeRecord = {
-    firstName: "Simba",
-    familyName: "King",
-    title: "",
-    timeInEvents: [],
-    timeOutEvents: [],
-  };
-
-  employeeRecord.timeOutEvents[0] = {
+  let [date, hour] = dateStamp.split(" ");
+  this.timeOutEvents.push({
     type: "TimeOut",
-    date: dateStamp.split(" ")[0],
-    hour: +dateStamp.split(" ")[1],
-  };
-  return employeeRecord;
+    hour: parseInt(hour, 10),
+    date,
+  });
+  return this;
 }
 
 // TASK FIVE
@@ -94,134 +80,47 @@ function createTimeOutEvent(dateStamp) {
 // let timeOut = createTimeOutEvent(cRecord, "0044-03-15 1100");
 // hoursWorkedOnDate(cRecord, "0044-03-15");
 
-function hoursWorkedOnDate(employeeRecord, dateForm = "") {
-  let timeInHour = createTimeInEvent(employeeRecord, "0044-03-15 0900");
-  let timeOutHour = createTimeOutEvent(employeeRecord, "0044-03-15 1100");
-  let timeDifference =
-    (timeInHour.timeInEvents[0].hour - timeOutHour.timeOutEvents[0].hour) / 100;
-  return Math.abs(timeDifference);
+function hoursWorkedOnDate(dateArg) {
+  let inEvents = this.timeInEvents.find((e) => e.date === dateArg);
+  let outEvents = this.timeOutEvents.find((e) => e.date === dateArg);
+  return (outEvents.hour - inEvents.hour) / 100;
 }
 
 // TASK SIX
 // draw inspiration from TASK FIVE
 
-function wagesEarnedOnDate(employeeRecord, dateForm = "") {
-  let timeInHour = createTimeInEvent(employeeRecord, "0044-03-15 0900");
-  let timeOutHour = createTimeOutEvent(employeeRecord, "0044-03-15 1100");
-  let timeDifference =
-    (timeOutHour.timeOutEvents[0].hour - timeInHour.timeInEvents[0].hour) / 100;
-  let payOwed = employeeRecord.payPerHour * timeDifference;
-  return payOwed;
+function wagesEarnedOnDate(dateArg) {
+  let raw = hoursWorkedOnDate.call(this, dateArg) * this.payPerHour;
+  return parseFloat(raw.toString());
 }
 
 // TASK SEVEN
 
-// function allWagesFor() {
-//   let employeeRecord = [
-//     {
-//       firstName: "Julius",
-//       familyName: "Caesar",
-//       title: "General",
-//       payPerHour: 27,
-//       timeInEvents: [{ type: "TimeIn", date: "0044-03-14", hour: 900 }],
-//       timeOutEvents: [{ type: "TimeOut", date: "0044-03-14", hour: 2100 }],
-//     },
-//     {
-//       firstName: "Julius",
-//       familyName: "Caesar",
-//       title: "General",
-//       payPerHour: 27,
-//       timeInEvents: [{ type: "TimeIn", date: "0044-03-15", hour: 900 }],
-//       timeOutEvents: [{ type: "TimeOut", date: "0044-03-15", hour: 1100 }],
-//     },
-//   ];
-
-//   let total = 0;
-//   employeeRecord.forEach((eachRecord) => {
-//     total +=
-//       (eachRecord.payPerHour *
-//         (eachRecord.timeOutEvents[0].hour - eachRecord.timeInEvents[0].hour)) /
-//       100;
-//   });
-//   return total;
-// }
+const allWagesFor = function () {
+  let avaiableDates = this.timeInEvents.map((obj) => obj.date);
+  let payable = avaiableDates.reduce(
+    function (accumulator, value) {
+      return accumulator + wagesEarnedOnDate.call(this, value);
+    }.bind(this),
+    0
+  );
+  return payable;
+};
 
 // TASK EIGHT
 
-// function calculatePayroll() {
-//   let employeeRecords = [
-//     {
-//       firstName: "Rafiki",
-//       familyName: "Aide",
-//       title: "",
-//       payPerHour: 10,
-//       timeInEvents: [
-//         {
-//           type: "TimeIn",
-//           date: "2019-01-11",
-//           hour: 900,
-//         },
-//         {
-//           type: "TimeIn",
-//           date: "2019-01-12",
-//           hour: 1000,
-//         },
-//       ],
-//       timeOutEvents: [
-//         {
-//           type: "TimeOut",
-//           date: "2019-01-11",
-//           hour: 1300,
-//         },
-//         {
-//           type: "TimeOut",
-//           date: "2019-01-12",
-//           hour: 1300,
-//         },
-//       ],
-//     },
-//     {
-//       firstName: "Simba",
-//       familyName: "King",
-//       title: "",
-//       payPerHour: 100,
-//       timeInEvents: [
-//         {
-//           type: "TimeIn",
-//           date: "2019-01-01",
-//           hour: 900,
-//         },
-//         {
-//           type: "TimeIn",
-//           date: "2019-01-02",
-//           hour: 1000,
-//         },
-//       ],
-//       timeOutEvents: [
-//         {
-//           type: "TimeOut",
-//           date: "2019-01-01",
-//           hour: 1300,
-//         },
-//         {
-//           type: "TimeOut",
-//           date: "2019-01-02",
-//           hour: 1300,
-//         },
-//       ],
-//     },
-//   ];
-//   let total = 0;
-//   employeeRecords.map((eachEmployee) => {
-//     total +=
-//       (eachEmployee.timeOutEvents[0].hour - eachEmployee.timeInEvents[0].hour) *
-//         eachEmployee.payPerHour +
-//       (eachEmployee.timeOutEvents[1].hour - eachEmployee.timeInEvents[1].hour) *
-//         eachEmployee.payPerHour;
-//   });
-//   total = total / 100;
-//   return total;
-// }
+function findEmployeeByFirstName(collection, firstNameString) {
+  return collection.find((obj) => obj.firstName === firstNameString);
+}
+
+// TASK NINE
+
+function calculatePayroll(employeeRecords) {
+  return employeeRecords.reduce((accumulator, value) => {
+    return accumulator + allWagesFor.call(value);
+  }, 0);
+}
+
 /*
  We're giving you this function. Take a look at it, you might see some usage
  that's new and different. That's because we're avoiding a well-known, but
@@ -231,17 +130,18 @@ function wagesEarnedOnDate(employeeRecord, dateForm = "") {
  for you to use if you need it!
  */
 
-const allWagesFor = function () {
-  const eligibleDates = this.timeInEvents.map(function (e) {
-    return e.date;
-  });
+//  IT IS THE ANSWER
+// let allWagesFor = function () {
+//   const eligibleDates = this.timeInEvents.map(function (e) {
+//     return e.date;
+//   });
 
-  const payable = eligibleDates.reduce(
-    function (memo, d) {
-      return memo + wagesEarnedOnDate.call(this, d);
-    }.bind(this),
-    0
-  ); // <== Hm, why did we need to add bind() there? We'll discuss soon!
+//   const payable = eligibleDates.reduce(
+//     function (memo, d) {
+//       return memo + wagesEarnedOnDate.call(this, d);
+//     }.bind(this),
+//     0
+//   ); // <== Hm, why did we need to add bind() there? We'll discuss soon!
 
-  return payable;
-};
+//   return payable;
+// };
